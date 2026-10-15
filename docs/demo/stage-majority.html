@@ -1,0 +1,154 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>MAGI賞 審議</title><style>
+:root{--void:#000;--signal:#ff8a1c;--signal-dim:#6b3608;--approve:#4ff2c8;--deny:#ff2a2a;--hold:#ffd23f;--fault:#8a8f99;--paper:#f4f1ea;
+--mincho:"HGP明朝E","HG明朝E","HGS明朝E","Yu Mincho","YuMincho","Hiragino Mincho ProN","Noto Serif JP",serif;
+--readout:"Bahnschrift","DIN Alternate","Arial Narrow","Yu Gothic UI",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}html{background:var(--void)}
+body{margin:0;background:var(--void);color:var(--signal);font-family:var(--readout);font-stretch:condensed;line-height:1.6}
+.mincho{font-family:var(--mincho);font-weight:900}
+svg.triad{display:block;width:100%;height:auto;overflow:visible}
+.triad .bus{stroke:var(--signal-dim);stroke-width:26;stroke-linecap:butt}
+.triad .core{fill:var(--signal);font-family:var(--mincho);font-weight:900;font-size:46px;letter-spacing:.08em}
+.triad polygon{stroke:var(--signal);stroke-width:4;fill:transparent;transition:fill .18s steps(2)}
+.triad .name{font-family:var(--mincho);font-weight:900;font-size:44px;fill:var(--signal)}
+.triad .word{font-family:var(--mincho);font-weight:900;font-size:64px;fill:var(--signal)}
+.triad .pts{font-family:var(--readout);font-size:26px;fill:var(--signal);letter-spacing:.04em}
+.triad g.approve polygon{fill:var(--approve);stroke:var(--approve)}.triad g.deny polygon{fill:var(--deny);stroke:var(--deny)}
+.triad g.hold polygon{fill:var(--hold);stroke:var(--hold)}.triad g.fault polygon{fill:url(#hatch);stroke:var(--fault)}
+.triad g.approve text,.triad g.deny text,.triad g.hold text{fill:#000}.triad g.fault text{fill:#fff}
+.triad g.pending polygon{animation:blink .5s steps(1) infinite}
+@keyframes blink{50%{fill:rgba(255,138,28,.42)}}
+.box{border:3px double var(--signal);padding:10px 16px;min-width:0}
+.box>h3{margin:0 0 6px;font-family:var(--mincho);font-weight:900;font-size:22px;letter-spacing:.3em;color:var(--signal)}
+.verdict-word{font-family:var(--mincho);font-weight:900;font-size:clamp(44px,7vw,96px);line-height:1;letter-spacing:.08em;padding:6px 14px;display:inline-block;border:4px solid currentColor}
+.v-APPROVED{color:var(--approve)}.v-REJECTED{color:var(--deny)}.v-HOLD{color:var(--hold)}.v-system{color:var(--fault)}
+a{color:var(--signal)}:focus-visible{outline:3px solid var(--approve);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.triad g.pending polygon{animation:none;fill:rgba(255,138,28,.25)}*{transition:none!important}}
+
+html,body{height:100%;overflow:hidden}body{cursor:none}
+.scene{position:fixed;inset:0;display:none;padding:3.2vh 3.2vw}.scene.on{display:flex}
+.frame{position:absolute;inset:2vh 1.6vw;border:2px solid var(--signal-dim);pointer-events:none}
+.hud{position:absolute;left:3.2vw;right:3.2vw;bottom:3vh;display:flex;justify-content:space-between;font-size:1.6vh;color:var(--signal-dim)}
+.opening{flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.opening .triad-holder{width:78vh}
+.opening h1{margin:2vh 0 0;font-family:var(--mincho);font-weight:900;font-size:9vh;letter-spacing:.12em;line-height:1;color:var(--signal)}
+.opening p{font-size:2.2vh;color:var(--paper);margin:1vh 0}
+.deliberation{display:grid;grid-template-columns:19vw 1fr 19vw;gap:1.6vw;width:100%;align-items:center}
+.deliberation .box p{margin:.6vh 0;font-size:2.4vh;color:var(--paper)}
+.deliberation .box>h3{font-size:3vh}
+.deliberation .title{font-family:var(--mincho);font-weight:900;font-size:5vh;line-height:1.2;color:var(--paper);margin:1vh 0}
+.deliberation .triad{max-height:86vh}
+.triad .word.pick{font-size:46px}
+.triad g.pick polygon{fill:var(--signal);stroke:var(--signal)}.triad g.pick text{fill:#000}
+#verdict{visibility:hidden;font-size:11vh}#verdict.on{visibility:visible;animation:stamp .35s steps(3)}
+#verdict-sub{font-family:var(--mincho);font-weight:900;font-size:3.4vh;color:var(--paper);min-height:4vh;white-space:pre-line}
+@keyframes stamp{0%{opacity:0;transform:scale(1.6)}100%{opacity:1;transform:scale(1)}}
+.card{flex-direction:column;justify-content:center;padding:0 9vw;background:#000}
+.card .ep{font-family:var(--mincho);font-weight:900;font-size:6vh;letter-spacing:.3em;color:var(--approve)}
+.card .ep.held{color:var(--hold)}
+.card h1{margin:2vh 0 0;font-family:var(--mincho);font-weight:900;font-size:15vh;line-height:1.05;color:#fff;transform:scaleX(.78);transform-origin:left;white-space:pre-line;width:128%}
+.card .why{margin-top:4vh;font-size:2.6vh;color:var(--paper);max-width:70vw}
+.sim{position:fixed;top:2.4vh;right:3.2vw;color:var(--hold);font-size:1.8vh;z-index:3}
+.board{flex-direction:column;padding:6vh 6vw 8vh}
+.board h2{margin:0 0 2.4vh;font-family:var(--mincho);font-weight:900;font-size:5vh;letter-spacing:.2em;color:var(--signal)}
+.board h2 small{display:inline;margin-left:1.4em;font-family:var(--readout);font-weight:400;font-size:2vh;letter-spacing:0;color:var(--paper)}
+.rows{display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;--fs:6.4vh}
+.row{display:grid;grid-template-columns:2em minmax(0,1fr) 7em 3.4em;align-items:center;gap:.6em;font-size:var(--fs);border-top:1px solid var(--signal-dim);padding:2.4vh 0}
+.row.outside{margin-top:4vh;border-top:2px dashed var(--signal)}
+.row .rank{font-family:var(--readout);color:var(--signal)}
+.row .name{font-family:var(--mincho);font-weight:900;color:var(--paper);line-height:1.15;min-width:0;overflow-wrap:anywhere}
+.row .name em{display:block;font-style:normal;font-family:var(--readout);font-weight:400;font-size:.42em;line-height:1.3;color:var(--signal)}
+.row .bar{height:.5em;background:var(--signal-dim);position:relative}.row .bar i{position:absolute;inset:0 auto 0 0;background:var(--signal)}
+.row .num{font-family:var(--readout);font-weight:600;color:var(--paper);text-align:right}
+.row.won .name,.row.won .num{color:var(--approve)}.row.won .bar i{background:var(--approve)}
+.row.partial .bar i{background:repeating-linear-gradient(90deg,var(--signal) 0 6px,transparent 6px 10px)}
+@media (prefers-reduced-motion:reduce){#verdict.on{animation:none}}
+</style></head><body><div class='sim'>SIMULATION ／ 架空の判定</div><div class='frame'></div><section class='scene opening' id='opening'><div class='triad-holder'><svg class='triad' viewBox='0 0 1000 600' role='img' aria-label='MAGI 3基の判定'><defs><pattern id='hatch' width='16' height='16' patternUnits='userSpaceOnUse' patternTransform='rotate(45)'><rect width='16' height='16' fill='#2a2c30'/><rect width='6' height='16' fill='#8a8f99'/></pattern></defs><line class='bus' x1='372' y1='230' x2='392' y2='362'/><line class='bus' x1='628' y1='230' x2='608' y2='362'/><line class='bus' x1='420' y1='482' x2='580' y2='482'/><text class='core' x='500' y='318' text-anchor='middle'>MAGI</text><g class='p-claude pending'><polygon points='330,30 670,30 670,190 612,248 388,248 330,190'/><text class='name' x='500' y='96' text-anchor='middle'>Opus 5.5</text><text class='word' x='500' y='170' text-anchor='middle'>審議中</text><text class='pts' x='500' y='214' text-anchor='middle'></text></g><g class='p-grok pending'><polygon points='70,322 352,322 420,390 420,570 70,570'/><text class='name' x='238' y='416' text-anchor='middle'>Grok 4.7</text><text class='word' x='238' y='490' text-anchor='middle'>審議中</text><text class='pts' x='238' y='534' text-anchor='middle'></text></g><g class='p-codex pending'><polygon points='648,322 930,322 930,570 580,570 580,390'/><text class='name' x='762' y='416' text-anchor='middle' textLength='270' lengthAdjust='spacingAndGlyphs'>GPT-6.1 Sol</text><text class='word' x='762' y='490' text-anchor='middle'>審議中</text><text class='pts' x='762' y='534' text-anchor='middle'></text></g></svg></div><h1>MAGI SYSTEM</h1><p>AI Gamejam Sapporo ／ MAGI賞 審議</p><p id='open-count'></p><p class='note'>Space・→で進む ／ ←で戻る ／ Fで全画面 ／ Rでやり直し</p></section><section class='scene' id='pick'><div class='deliberation'><div class='box'><h3>提訴</h3><p class='title'>MAGI賞</p><p>議案：最も優れた作品を1つ推薦せよ</p><p>2基以上が推した作品に授与。割れた場合は、推された作品のうち3基の平均点が最も高い作品に授与。</p></div><div><svg class='triad' id='pick-triad' viewBox='0 0 1000 600' role='img' aria-label='MAGI 3基の判定'><defs><pattern id='hatch' width='16' height='16' patternUnits='userSpaceOnUse' patternTransform='rotate(45)'><rect width='16' height='16' fill='#2a2c30'/><rect width='6' height='16' fill='#8a8f99'/></pattern></defs><line class='bus' x1='372' y1='230' x2='392' y2='362'/><line class='bus' x1='628' y1='230' x2='608' y2='362'/><line class='bus' x1='420' y1='482' x2='580' y2='482'/><text class='core' x='500' y='318' text-anchor='middle'>MAGI</text><g class='p-claude idle'><polygon points='330,30 670,30 670,190 612,248 388,248 330,190'/><text class='name' x='500' y='96' text-anchor='middle'>Opus 5.5</text><text class='word' x='500' y='170' text-anchor='middle'></text><text class='pts' x='500' y='214' text-anchor='middle'></text></g><g class='p-grok idle'><polygon points='70,322 352,322 420,390 420,570 70,570'/><text class='name' x='238' y='416' text-anchor='middle'>Grok 4.7</text><text class='word' x='238' y='490' text-anchor='middle'></text><text class='pts' x='238' y='534' text-anchor='middle'></text></g><g class='p-codex idle'><polygon points='648,322 930,322 930,570 580,570 580,390'/><text class='name' x='762' y='416' text-anchor='middle' textLength='270' lengthAdjust='spacingAndGlyphs'>GPT-6.1 Sol</text><text class='word' x='762' y='490' text-anchor='middle'></text><text class='pts' x='762' y='534' text-anchor='middle'></text></g></svg></div><div class='box'><h3>決議</h3><span id='verdict' class='verdict-word'></span><p id='verdict-sub'></p></div></div></section><section class='scene card' id='card'><div class='ep' id='card-ep'></div><h1 id='card-title'></h1><div class='why' id='card-why'></div></section><section class='scene board' id='board'><h2>平均点 上位3作品<small>3つのAIの採点（共通配点）の平均。100点満点。MAGI賞は各AIの推しの中から決まります</small></h2><div class='rows' id='board-rows'></div></section><div class='hud'><span>MAGI ／ 3基の独立審議。エヴァンゲリオン公式のシステムではありません</span><span id='hud-pos'></span></div><script type='application/json' id='magi-data'>{"theme": "見えないもの", "count": 8, "picks": {"codex": {"state": "pick", "title": "透明人間のかくれんぼ", "points": "80 点"}, "claude": {"state": "pick", "title": "透明人間のかくれんぼ", "points": "90 点"}, "grok": {"state": "pick", "title": "見えない迷路", "points": "90 点"}}, "board": [{"rank": 1, "title": "透明人間のかくれんぼ", "seat": 76.67, "label": "76.67", "width": 76.67, "won": true, "pickedBy": ["GPT-6.1 Sol", "Opus 5.5"]}, {"rank": 2, "title": "見えない迷路", "seat": 70.0, "label": "70", "width": 70.0, "won": false, "pickedBy": ["Grok 4.7"]}, {"rank": 3, "title": "影ふみ", "seat": 63.33, "label": "63.33", "width": 63.33, "won": false, "pickedBy": []}], "verdict": {"split": false, "held": false, "word": "可決", "cls": "v-APPROVED", "sub": "MAGI賞\n透明人間のかくれんぼ", "panels": {"codex": "approve", "claude": "approve", "grok": "reject"}, "reason": "2基が推薦。多数決で授与。", "winners": ["透明人間のかくれんぼ"]}}</script><script>
+const D = JSON.parse(document.getElementById('magi-data').textContent);
+const ORDER = ['codex','claude','grok'];
+const CLS = {approve:'approve',reject:'deny',abstain:'hold',fault:'fault',pending:'pending',pick:'pick',idle:'idle'};
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const steps = ['opening', 'ready', ...ORDER.map(p => 'pick:' + p)];
+if (D.verdict.split) steps.push('split');
+steps.push('verdict', 'title', 'board');
+let index = 0, timers = [];
+
+function fit(el, width) {
+  el.removeAttribute('textLength'); el.removeAttribute('lengthAdjust');
+  if (el.getComputedTextLength && el.getComputedTextLength() > width) {
+    el.setAttribute('textLength', width); el.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+  }
+}
+function setPanel(provider, state, word, pts) {
+  const g = $('pick-triad').querySelector('.p-' + provider);
+  g.setAttribute('class', 'p-' + provider + ' ' + CLS[state]);
+  const w = g.querySelector('.word');
+  w.setAttribute('class', 'word' + (state === 'pending' ? '' : ' pick'));
+  w.textContent = word; fit(w, 290);
+  g.querySelector('.pts').textContent = pts || '';
+}
+function shown(provider) {
+  const p = D.picks[provider];
+  if (p.state === 'fault') return ['fault', '障害', ''];
+  if (p.state === 'abstain') return ['abstain', '棄権', p.reason];
+  return ['pick', p.title, p.points];
+}
+function stamp(word, cls, sub) {
+  const v = $('verdict');
+  v.className = 'verdict-word'; void v.offsetWidth;
+  if (!word) { v.textContent = ''; $('verdict-sub').textContent = ''; return; }
+  v.textContent = word; v.className = 'verdict-word ' + cls + ' on';
+  $('verdict-sub').textContent = sub;
+}
+function show(id) { document.querySelectorAll('.scene').forEach(s => s.classList.toggle('on', s.id === id)); }
+
+function render() {
+  timers.forEach(clearTimeout); timers = [];
+  const step = steps[index];
+  $('hud-pos').textContent = (index + 1) + ' / ' + steps.length;
+  if (step === 'opening') { show('opening'); return; }
+  if (step === 'title') { show('card'); return; }
+  if (step === 'board') { show('board'); return; }
+  show('pick');
+  // Rebuild the board from scratch so going backwards always shows the right state.
+  const revealed = step === 'ready' ? 0 : step.startsWith('pick:') ? ORDER.indexOf(step.slice(5)) + 1 : 3;
+  ORDER.forEach((p, k) => {
+    if (k >= revealed) { setPanel(p, 'pending', '審議中', ''); return; }
+    const [state, word, pts] = shown(p);
+    if (step === 'split') { setPanel(p, state === 'pick' ? 'abstain' : state, word, pts); return; }
+    if (step === 'verdict') { setPanel(p, D.verdict.panels[p], word, pts); return; }
+    setPanel(p, state, word, pts);
+  });
+  if (step === 'split') stamp('決裂', 'v-HOLD', '3基の推しが割れました\n平均点で決定します');
+  else if (step === 'verdict') stamp(D.verdict.word, D.verdict.cls, D.verdict.sub);
+  else stamp('', '', '');
+}
+function go(n) { index = Math.max(0, Math.min(steps.length - 1, index + n)); render(); }
+document.addEventListener('keydown', ev => {
+  if ([' ', 'ArrowRight', 'Enter', 'PageDown'].includes(ev.key)) { ev.preventDefault(); go(1); }
+  else if (['ArrowLeft', 'Backspace', 'PageUp'].includes(ev.key)) { ev.preventDefault(); go(-1); }
+  else if (ev.key === 'r') render();
+  else if (ev.key === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}); }
+});
+document.addEventListener('click', () => go(1));
+(function fill() {
+  $('open-count').textContent = '審議対象 ' + D.count + ' 作品' + (D.theme ? ' ／ テーマ「' + D.theme + '」' : '');
+  $('card-ep').textContent = D.verdict.held ? '審議保留' : 'MAGI賞';
+  $('card-ep').classList.toggle('held', D.verdict.held);
+  $('card-title').textContent = D.verdict.winners.join('\n');
+  $('card-why').textContent = D.verdict.reason;
+  const rows = $('board-rows');
+  D.board.forEach(b => {
+    const row = document.createElement('div');
+    row.className = 'row' + (b.won ? ' won' : '') + (b.seat === null ? ' partial' : '') + (b.outside ? ' outside' : '');
+    const rank = document.createElement('span'); rank.className = 'rank'; rank.textContent = b.rank;
+    const name = document.createElement('span'); name.className = 'name'; name.textContent = b.title;
+    if (b.pickedBy.length) { const tag = document.createElement('em'); tag.textContent = '推し：' + b.pickedBy.join('・'); name.appendChild(tag); }
+    const bar = document.createElement('span'); bar.className = 'bar';
+    const fill = document.createElement('i'); fill.style.width = Math.max(0, Math.min(100, b.width)) + '%'; bar.appendChild(fill);
+    const num = document.createElement('span'); num.className = 'num'; num.textContent = b.label;
+    row.append(rank, name, bar, num); rows.appendChild(row);
+  });
+})();
+render();
+</script></body></html>

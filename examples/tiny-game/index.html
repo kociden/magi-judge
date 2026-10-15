@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><title>10秒ぴったり</title>
+<style>body{font:24px sans-serif;background:#111827;color:#fafafa;text-align:center;padding:15vh 10px}button{font:inherit;padding:16px 28px}p{min-height:2em}</style>
+<h1>10秒ぴったり</h1><p>開始したら心の中で10秒数えて、止めよう。</p><button id="button">開始</button><p id="result" aria-live="polite"></p>
+<script>
+let start = null;
+const button = document.getElementById('button');
+const result = document.getElementById('result');
+button.addEventListener('click', () => {
+  if (start === null) {
+    start = performance.now();
+    button.textContent = '止める';
+    result.textContent = '心の時計だけが頼り。';
+  } else {
+    const elapsed = (performance.now() - start) / 1000;
+    const error = Math.abs(elapsed - 10);
+    result.textContent = `${elapsed.toFixed(2)}秒！ ずれ ${error.toFixed(2)}秒。${error < 0.2 ? 'すごい！' : 'もう一度挑戦！'}`;
+    start = null;
+    button.textContent = 'もう一度';
+  }
+});
+</script></html>

@@ -1,0 +1,20 @@
+あなたはMAGI審査システムのClaude Code接続担当です。審査ではなく、Claude Code自身のサブスク接続セットアップと疎通確認を実施してください。
+
+作業場所: このリポジトリのルート（現在の作業ディレクトリ）
+最初に README.md と magi/providers.py を読んでください。Codex側が全体を統合します。新しいCodexチャットや子エージェントを作らないでください。
+
+実施すること:
+1. インストール済みの公式Claude Codeのバージョン、help、公式の認証状態コマンドで、claude.aiサブスク認証を確認してください。現行アダプタは claude --safe-mode auth status の loggedIn=true、authMethod=claude.ai/claudeai、apiProvider=firstParty を要求します。認証情報ファイルや環境変数の値は読まず、状態として必要なフィールドだけを記録してください。
+2. magi.providers.preflight('claude') を実行してください。未認証・プラン不足なら推論を実行せず、blockerと公式の claude auth login 手順を報告してください。ログイン操作、ブラウザでの本人認証、契約変更は担当者に任せてください。
+3. 準備できていれば、magi.providers.invoke('claude', prompt, schema, work_dir, timeout=120) を使い、小さな実リクエストを1回試してください。schemaは追加キー禁止の {"provider":"claude","status":"ready"} を要求するJSON Schema、promptもこのJSONだけを返す短文にします。work_dirは setup/results/claude/ 配下の新しい空ディレクトリにしてください。これはstdin、--safe-mode -p、空の--tools、--json-schema、structured_outputの解析を通す確認です。このセットアップ依頼文自体を再実行させないでください。
+4. 失敗したら自分のprovider部分だけを診断してください。インストール済みCLIのhelpと実際の出力に基づき、認証・Windowsの引数・stdin・スキーマ出力の問題を分けてください。APIへの切替や制限解除で通さないでください。追加の実リクエストは、判明した原因を直した確認に必要な最小回数だけにしてください。
+5. 必要な修正案は setup/results/claude/proposed.patch と診断メモに保存してください。共有の magi/providers.py、README、tests、他providerのファイルは直接変更しないでください。既存の該当テストを必要に応じて実行し、模擬テストと実通信成功を区別してください。
+
+守ること:
+- APIキー、OAuthトークン、資格情報ファイルの内容を読まない・コピーしない・出力しないでください。環境変数の一覧や認証ファイルのダンプは禁止です。表示にメール等が含まれる場合も結果には残さないでください。
+- API従量課金、API認証、別プロバイダ、有料契約・サブスク変更、全体ユーザー設定の変更を使わないでください。既存アダプタのサブスク専用ガードを維持してください。
+- 成果物の書込みは setup/results/claude/ のみにしてください。通常のCLIによる既存サブスク認証の利用は可能ですが、認証ファイルの手編集はしないでください。
+
+最後に setup/results/claude/result.json をUTF-8で保存してください:
+{"provider":"claude","ready":false,"blocker":null,"commands":[],"tests":[]}
+readyは既存アダプタ経由の実通信で指定JSONが返り、API課金を使っていないと確認できた場合だけtrueです。blockerは未解決事項の短い文字列またはnull、commandsは実行した秘密情報を含まないコマンド、testsは{name,kind:"live"|"mock"|"static",passed,detail}の配列にしてください。未実施テストを成功扱いしないでください。最終回答にはready、blocker、成果物の場所だけを簡潔に書いてください。

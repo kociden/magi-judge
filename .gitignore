@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+# Judging output, CLI logs and local handoff material stay on each machine.
+runs/
+setup/logs/
+setup/results/
+handoff/

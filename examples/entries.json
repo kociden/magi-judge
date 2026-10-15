@@ -1,0 +1,14 @@
+{
+  "theme": "見えないもの",
+  "entries": [
+    {
+      "id": "sample01",
+      "title": "10秒ぴったり",
+      "game": "tiny-game",
+      "attachments": ["transcript.txt"],
+      "statement": "statement.txt",
+      "play_records": ["play-record.md"],
+      "redact": []
+    }
+  ]
+}

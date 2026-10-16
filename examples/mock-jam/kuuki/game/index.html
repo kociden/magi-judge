@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><title>空気を読め！</title>
+<style>body{background:#0e2235;color:#fff;font:20px sans-serif;text-align:center;padding:6vh 12px}button{font:inherit;margin:6px;padding:10px 18px}</style>
+<h1>空気を読め！</h1>
+<p id="q"></p>
+<div id="choices"></div>
+<p id="r"></p>
+<script>
+// TODO: AI生成・オンライン対戦は間に合わなかったので固定の3問
+const quiz = [
+  {q: '上司が「今日は早く帰っていいよ」と言った。どうする？', c: ['帰る', '少し残る', '上司に先に帰ってもらう'], a: 1},
+  {q: '友達が新しい髪型で来た。最初のひとことは？', c: ['似合うね', '切った？', '何も言わない'], a: 0},
+  {q: 'エレベーターで知らない人と2人きり。', c: ['話しかける', 'スマホを見る', '階数表示を見る'], a: 2},
+];
+let i = 0, score = 0;
+function render() {
+  if (i >= quiz.length) { document.getElementById('q').textContent = `終了！ 空気読み度 ${score}/3`; document.getElementById('choices').innerHTML = ''; return; }
+  document.getElementById('q').textContent = quiz[i].q;
+  const box = document.getElementById('choices'); box.innerHTML = '';
+  quiz[i].c.forEach((text, k) => {
+    const b = document.createElement('button'); b.textContent = text;
+    b.onclick = () => { if (k === quiz[i].a) score++; document.getElementById('r').textContent = k === quiz[i].a ? '空気読めてる！' : '…'; i++; render(); };
+    box.appendChild(b);
+  });
+}
+render();
+</script>
+</html>

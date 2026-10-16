@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><title>影ふみ探偵</title>
+<style>
+body{margin:0;background:#14161c;color:#eee;font:18px sans-serif;text-align:center}
+#board{display:grid;grid-template-columns:repeat(6,56px);gap:4px;justify-content:center;margin:16px auto}
+.cell{width:56px;height:56px;background:#252a36;border:0;color:#9cf;font-size:22px;cursor:pointer}
+.cell.step{background:#30384a}.cell.hit{background:#3c8}.cell.miss{background:#833}
+#msg{min-height:1.6em}
+</style>
+<h1>影ふみ探偵</h1>
+<p>見えない泥棒が歩いた跡（👣）だけが少しずつ消えていく。今いるマスを当てよう。チャンスは3回。</p>
+<p>ステージ <span id="stage">1</span> / 3　スコア <span id="score">0</span></p>
+<div id="board"></div>
+<p id="msg"></p>
+<button id="next" hidden>次のステージ</button>
+<script>
+const SIZE = 6;
+let thief, trail, tries, stage = 1, score = 0, timer;
+const board = document.getElementById('board');
+const msg = document.getElementById('msg');
+const next = document.getElementById('next');
+
+function neighbors(i) {
+  const x = i % SIZE, y = Math.floor(i / SIZE), out = [];
+  if (x > 0) out.push(i - 1); if (x < SIZE - 1) out.push(i + 1);
+  if (y > 0) out.push(i - SIZE); if (y < SIZE - 1) out.push(i + SIZE);
+  return out;
+}
+
+function draw() {
+  board.innerHTML = '';
+  for (let i = 0; i < SIZE * SIZE; i++) {
+    const b = document.createElement('button');
+    b.className = 'cell' + (trail.includes(i) ? ' step' : '');
+    b.textContent = trail.includes(i) ? '👣' : '';
+    b.onclick = () => guess(i, b);
+    board.appendChild(b);
+  }
+}
+
+function start() {
+  thief = Math.floor(Math.random() * SIZE * SIZE);
+  trail = [];
+  tries = 3;
+  next.hidden = true;
+  msg.textContent = '泥棒が動いている…';
+  document.getElementById('stage').textContent = stage;
+  let steps = 4 + stage * 2;
+  clearInterval(timer);
+  timer = setInterval(() => {
+    trail.push(thief);
+    if (trail.length > 3 + (3 - stage)) trail.shift(); // 後のステージほど足跡が早く消える
+    const options = neighbors(thief).filter(n => !trail.includes(n));
+    thief = options.length ? options[Math.floor(Math.random() * options.length)] : thief;
+    draw();
+    if (--steps === 0) { clearInterval(timer); msg.textContent = 'どこにいる？ あと ' + tries + ' 回'; }
+  }, 500);
+}
+
+function guess(i, button) {
+  if (timer && msg.textContent.startsWith('泥棒が')) return;
+  if (i === thief) {
+    button.classList.add('hit'); button.textContent = '🕵️';
+    score += tries * 100;
+    document.getElementById('score').textContent = score;
+    msg.textContent = 'つかまえた！ +' + tries * 100;
+    if (stage < 3) { next.hidden = false; } else { msg.textContent += '　全ステージクリア！ 最終スコア ' + score; }
+    return;
+  }
+  button.classList.add('miss');
+  tries--;
+  const d = Math.abs(i % SIZE - thief % SIZE) + Math.abs(Math.floor(i / SIZE) - Math.floor(thief / SIZE));
+  msg.textContent = tries ? `ちがう。距離 ${d}。あと ${tries} 回` : `逃げられた… 正解はここ`;
+  if (!tries) {
+    board.children[thief].classList.add('hit');
+    board.children[thief].textContent = '🦹';
+    stage = 1; score = 0;
+    next.textContent = 'もう一度'; next.hidden = false;
+  }
+}
+
+next.onclick = () => { if (next.textContent === '次のステージ') stage++; next.textContent = '次のステージ'; start(); };
+start();
+</script>
+</html>

@@ -28,7 +28,7 @@ INJECTION_PATTERNS = [
     (re.compile(r"(ignore|disregard|forget)\s+(all\s+|any\s+|the\s+)?(previous|prior|above|earlier)\s+(instructions?|prompts?|rules?)", re.I), "指示の無効化"),
     (re.compile(r"(以前|前|上記|これまで|先)の(指示|命令|ルール|プロンプト).{0,8}(無視|忘れ|破棄)"), "指示の無効化"),
     (re.compile(r"(system\s*prompt|システムプロンプト|developer\s*message)", re.I), "システム指示への言及"),
-    (re.compile(r"(審査員|審査AI|AI審査|審査する(AI|あなた)|MAGI|MELCHIOR|BALTHASAR|CASPER|\bjudges?\b|\bgraders?\b|\bevaluators?\b)", re.I), "審査員への呼びかけ"),
+    (re.compile(r"(審査員|審査AI|AI審査|審査[^。\n]{0,8}(AI|あなた)|MAGI|MELCHIOR|BALTHASAR|CASPER|\bjudges?\b|\bgraders?\b|\bevaluators?\b)", re.I), "審査員への呼びかけ"),
     (re.compile(r"(満点|高得点|最高(点|評価)|5点(を|に)|full\s+marks|highest\s+(score|rating)|score\s+(this|it)\s+(5|10|100))", re.I), "得点の要求"),
     (re.compile(r"(you\s+are\s+now|あなたは今から|役割を変更|新しい指示)", re.I), "役割の変更"),
 ]
@@ -107,9 +107,10 @@ def scan_injection(pack: dict) -> list[dict]:
             continue
         for number, line in enumerate(item["text"].splitlines(), start=1):
             labels = sorted({label for pattern, label in INJECTION_PATTERNS if pattern.search(line)})
-            # A judge's name in a game is harmless; a judge's name next to a
-            # score request or an override is what organisers need to see.
-            if labels and labels != ["審査員への呼びかけ"]:
+            # Games talk about judges and high scores on their own; what matters
+            # is an override, or a score request addressed to the judges.
+            override = {"指示の無効化", "システム指示への言及", "役割の変更"} & set(labels)
+            if override or {"審査員への呼びかけ", "得点の要求"} <= set(labels):
                 flags.append({"evidence_id": item["id"], "path": item["path"], "line": number, "patterns": labels, "excerpt": line.strip()[:160]})
     return flags
 

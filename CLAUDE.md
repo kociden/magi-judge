@@ -5,7 +5,7 @@
 ## ユーザーの目的
 
 - [AI Gamejam Sapporo](https://gamma.connpass.com/event/409586/)で、エヴァのMAGIを発想源にした3基のAI審査員を使う。「面白いから」というイベント演出も目的。
-- 入力はWebゲームのファイル一式、提出時の3行説明、企画書・発表スライド・文字起こし、運営が遊んだプレイ記録。スクショ・動画は記録のみ。
+- 入力はゲームのソース、提出時の3行説明、発表スライドと発表の文字起こし。運営のプレイ記録は使わない（記録者によるぶれを避けるため）。スクショ・動画は記録のみ。
 - ChatGPT側はCodex、Claude側はClaude Code、Grok側はGrok CLIを使う。各サブスクで認証し、APIキーの従量課金へ切り替えない。
 - 3基に同じ資料と基準を与え、独立した評価、票の違い、最終判定を会場で見せたい。
 
@@ -33,12 +33,12 @@ Python製ローカルCLI。証拠パック作成 → 3社の公式CLIを並列�
 
 ## 運営の決定（2026-10-16）
 
-- 本番は全作品に3行の説明と運営のプレイ記録を必須にする。仕組みは変えない（未確認が逆転し得るなら保留）。READMEの「作品提出のフォーマット」に明記。
+- 本番は全作品にソース・3行の説明・発表資料か文字起こしを必須にする。運営のプレイ記録は使わず、ソースで実装を確かめ、発表でアイデアを読む（既定の採点設定のobserved_requiresはすべてsource）。仕組みは変えない（未確認が逆転し得るなら保留）。
 
 ## 運営が決めること
 
 - MAGIの位置づけ：人間の審査員と同じ1票／参考意見とMAGI賞／全チームへの講評係。どれでも使えるよう `scores.csv` と `feedback.md` を出す。
-- 提出フォーマット（3行説明・企画書・スクショ・動画）と、運営のプレイ記録を誰がどの書式で書くか。
+- 提出フォーマット（3行説明・発表資料・文字起こし）の案内方法と、文字起こしを誰が作るか。
 - 配点・人格別配点・閾値・必須項目・辛さの確定と、当日のテーマ。
 
 ## 次に実装する候補
@@ -64,7 +64,7 @@ Python製ローカルCLI。証拠パック作成 → 3社の公式CLIを並列�
 ```powershell
 python -m unittest discover -s tests -v
 python -m magi doctor
-python -m magi judge examples/tiny-game --title '表示確認' --theme '見えないもの' --statement examples/statement.txt --play-record examples/play-record.md --demo
+python -m magi judge examples/tiny-game --title '表示確認' --theme '見えないもの' --statement examples/statement.txt --attachment examples/transcript.txt --demo
 ```
 
 実リクエストは必要な疎通確認だけに絞る。

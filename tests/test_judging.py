@@ -25,7 +25,7 @@ PACK = {"items": [
 INDEX = evidence_index(PACK)
 
 
-def criterion(status="observed", score=3.0, cite="P001", limits=""):
+def criterion(status="observed", score=3.0, cite="F001", limits=""):
     evidence = [] if cite is None else [{"evidence_id": cite, "line_start": 1, "line_end": 2, "observation": "確認"}]
     return {"status": status, "score": score, "rationale": "理由", "limits": limits, "evidence": evidence}
 
@@ -117,8 +117,8 @@ class DecisionValidationTests(unittest.TestCase):
             validate_decision(decision(fun=criterion("inferred", 3, "F001", limits="")), RUBRIC, INDEX)
 
     def test_observed_from_the_wrong_evidence_kind_is_downgraded_with_a_note(self):
-        # Fun can only be observed from a play record; source and claims are inferences.
-        normalized, notes = validate_decision(decision(fun=criterion(cite="F001"), ai_usage=criterion(cite="S001")), RUBRIC, INDEX)
+        # Presentation material and statements are claims: they support inferences only.
+        normalized, notes = validate_decision(decision(fun=criterion(cite="S001"), ai_usage=criterion(cite="S001")), RUBRIC, INDEX)
         self.assertEqual(normalized["criteria"]["fun"]["status"], "inferred")
         self.assertEqual(normalized["criteria"]["ai_usage"]["status"], "inferred")
         self.assertIn("ホストが推定に変更", normalized["criteria"]["fun"]["limits"])
@@ -148,7 +148,7 @@ class TallyTests(unittest.TestCase):
         missing_required = merge_samples([decision(5, fun=criterion("not_observed", None, None))], RUBRIC)
         vote, reason = persona_vote(missing_required, RUBRIC, "codex")
         self.assertEqual(vote, "abstain")
-        self.assertIn("面白さの芯", reason)
+        self.assertIn("アイデアと遊びの設計", reason)
         straddle = merge_samples([decision(3.5, theme=criterion("not_observed", None, None))], RUBRIC)
         self.assertEqual(persona_vote(straddle, RUBRIC, "codex")[0], "abstain")
         hopeless = merge_samples([decision(1, theme=criterion("not_observed", None, None))], RUBRIC)

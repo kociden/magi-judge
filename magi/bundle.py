@@ -305,8 +305,11 @@ def build_bundle(
     # statement, and the staff play record are weighed differently later.
     groups = (("attachment", attachments), ("statement", statements), ("play", play_records))
     for prefix, paths in groups:
+        # Collapse "." and ".." lexically so a relative path such as
+        # "../notes.txt" is not mistaken for a hidden name; links are still
+        # checked below, because normpath does not follow them.
         ordered = sorted(
-            (Path(path).absolute() for path in (paths or [])),
+            (Path(os.path.normpath(Path(path).absolute())) for path in (paths or [])),
             key=lambda path: (path.as_posix().casefold(), path.as_posix()),
         )
         for index, attachment in enumerate(ordered[:MAX_ATTACHMENTS], start=1):

@@ -110,6 +110,15 @@ class BundleTests(unittest.TestCase):
         self.assertEqual(result["attachments"][1]["text"], "発表の文字起こし")
         self.assertNotIn(str(self.base), json.dumps(result))
 
+    def test_relative_paths_with_parent_steps_are_not_treated_as_hidden(self):
+        notes = self.game.parent / "notes"
+        notes.mkdir()
+        (notes / "statement.txt").write_text("説明", encoding="utf-8")
+        relative = self.game / ".." / "notes" / "statement.txt"
+        result = bundle.build_bundle(self.game, "test", statements=[relative], play_records=[relative])
+        self.assertEqual([a["path"] for a in result["attachments"]], ["play/001-statement.txt", "statement/001-statement.txt"])
+        self.assertEqual(result["omissions"], [])
+
     def test_explicit_pptx_text_is_extracted_and_project_slides_stay_unanalysed(self):
         slides = self.game / "slides.pptx"
         slide_xml = (

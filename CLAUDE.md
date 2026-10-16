@@ -23,6 +23,7 @@ Python製ローカルCLI。証拠パック作成 → 3社の公式CLIを並列�
 | ファイル | 役割 |
 | --- | --- |
 | `magi/__main__.py` | `doctor`、`judge`、`batch`、`compare` のCLIと実行制御、再利用・再開 |
+| `magi/launcher.py` / `MAGI.cmd` | 番号メニュー（`python -m magi menu`）。各操作は通常のCLIを呼ぶだけ |
 | `magi/rubric.py` / `default_rubric.json` | 人格、採点設定と検証。`rubric.example.json` は同じ内容（テストで一致を確認） |
 | `magi/evidence.py` | 証拠パック、資料ID、行番号付きの提示、匿名化、注入検出、メディアのハッシュ |
 | `magi/judging.py` | プロンプト、出力スキーマ、出力検証、試行の平均、合計・票・比較 |

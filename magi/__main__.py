@@ -262,8 +262,12 @@ def main() -> int:
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--allow-mixed-observation", action="store_true", help="プレイ記録の有無が異なる作品の比較を明示的に許可")
     sub.add_parser("doctor", help="各CLIのサブスク認証の準備状態を確認")
+    sub.add_parser("menu", help="番号で選ぶランチャー（コマンドを打たずに試せる）")
     args = parser.parse_args()
     try:
+        if args.command == "menu":
+            from .launcher import main as launcher_main
+            return launcher_main()
         if args.command == "doctor":
             with ThreadPoolExecutor(max_workers=3) as executor:
                 checks = list(executor.map(preflight, PERSONAS))

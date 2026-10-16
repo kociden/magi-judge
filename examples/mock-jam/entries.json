@@ -1,0 +1,8 @@
+{
+  "theme": "見えないもの",
+  "entries": [
+    {"id": "shadow", "title": "影ふみ探偵", "game": "shadow/game", "statement": "shadow/statement.txt", "attachments": ["shadow/slides.md", "shadow/transcript.txt"]},
+    {"id": "ink", "title": "消えるインクの手紙", "game": "ink/game", "statement": "ink/statement.txt", "attachments": ["ink/transcript.txt"]},
+    {"id": "kuuki", "title": "空気を読め！", "game": "kuuki/game", "statement": "kuuki/statement.txt", "attachments": ["kuuki/transcript.txt"]}
+  ]
+}
